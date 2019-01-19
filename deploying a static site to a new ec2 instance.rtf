@@ -1,0 +1,52 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf200
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red23\green23\blue23;\red85\green129\blue224;
+\red194\green126\blue101;}
+{\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c11765\c11765\c11765;\cssrgb\c40392\c58824\c90196;
+\cssrgb\c80784\c56863\c47059;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f0\fs24 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf4 \strokec4 -\cf2 \strokec2  ssh into the ec2 instance\
+\cf4 \strokec4 -\cf2 \strokec2  update the system: \cf5 \strokec5 `sudo apt update && sudo apt upgrade -y`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  reboot: \cf5 \strokec5 `sudo reboot`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  (wait a couple minutes or go get coffee)\
+\cf4 \strokec4 -\cf2 \strokec2  ssh into the ec2 instance\
+\cf4 \strokec4 -\cf2 \strokec2  install nginx: \cf5 \strokec5 `sudo apt install nginx`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  if this is the first time the instance has been used (that is, has never talked to github before), generate keys: - \cf5 \strokec5 `ssh-keygen -t rsa -b 4096 -C "butt@face.com"`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  (preferably, with no passphrase)\
+\cf4 \strokec4 -\cf2 \strokec2  (otherwise, take all the defaults)\
+\cf4 \strokec4 -\cf2 \strokec2  output the public key to the terminal: \cf5 \strokec5 `cat ~/.ssh/id_rsa.pub`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  select and copy what got printed to the terminal\
+\cf4 \strokec4 -\cf2 \strokec2  log into github, click menu in upper right corner, click "settings"\
+\cf4 \strokec4 -\cf2 \strokec2  on settings page, click "ssh and gpg keys"\
+\cf4 \strokec4 -\cf2 \strokec2  click green button in upper right labeled "new ssh key"\
+\cf4 \strokec4 -\cf2 \strokec2  give it a title, paste in the public key, click "add ssh key" button\
+\cf4 \strokec4 -\cf2 \strokec2  then, go to the github project and grab the clone URL for the project you want to deploy (edited)\
+\cf4 \strokec4 -\cf2 \strokec2  back in the terminal (where you're logged into the ec2 instance): \cf5 \strokec5 `git clone <clone url>`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  \cf5 \strokec5 `cd`\cf2 \strokec2  into the directory that got created when you cloned\
+\cf4 \strokec4 -\cf2 \strokec2  type \cf5 \strokec5 `pwd`\cf2 \strokec2  and copy this full path\
+\cf4 \strokec4 -\cf2 \strokec2  and now...edit the nginx config: \cf5 \strokec5 `sudo nano /etc/nginx/sites-available/default`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  find the part that starts with \cf5 \strokec5 `server \{`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  find the line that starts with \cf5 \strokec5 `root`\cf2 \strokec2  and ends with \cf5 \strokec5 `;`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  delete the path (which defaults to something like \cf5 \strokec5 `/var/www/html`\cf2 \strokec2 )\
+\cf4 \strokec4 -\cf2 \strokec2  paste in the path to the cloned static site (probably something like \cf5 \strokec5 `/home/ubuntu/LeftCheekRightCheek`\cf2 \strokec2 )\
+\cf4 \strokec4 -\cf2 \strokec2  save the file: \cf5 \strokec5 `ctrl-o`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  exit nano :\cf5 \strokec5 `ctrl-x`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  check that the config has no typos: \cf5 \strokec5 `sudo nginx -t`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  if successful, it should print a message with something like \cf5 \strokec5 `syntax ok`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  then, restart nginx: \cf5 \strokec5 `sudo systemctl nginx restart`\cf2 \strokec2 \
+\cf4 \strokec4 -\cf2 \strokec2  (take a deep breath)\
+\cf4 \strokec4 -\cf2 \strokec2  one more thing: in the column to the left of where the public DNS is listed, there's an item labeled "security - groups"\
+\cf4 \strokec4 -\cf2 \strokec2  click the one labeled "launch-wizard..."\
+\cf4 \strokec4 -\cf2 \strokec2  make that panel taller by dragging the three dots in the middle and drag up\
+\cf4 \strokec4 -\cf2 \strokec2  click "add rule"\
+\cf4 \strokec4 -\cf2 \strokec2  choose "HTTP" from the dropdown menu (which by default is labeled "custom rule")\
+\cf4 \strokec4 -\cf2 \strokec2  for good measure, click "add rule" again and choose "HTTPS"\
+\cf4 \strokec4 -\cf2 \strokec2  then, in a browser, go to the public DNS for the aws instance (which you can find in the aws console, under ec2, - under the "running instances", by clicking on the single running instance)\
+\cf4 \strokec4 -\cf2 \strokec2  yeah! and then, go to the browser and try to pull up the site\
+}
